@@ -29,13 +29,13 @@ function do_locales()
 
 function do_install_locales()
 {
-  dir=$DATADIR/locale/$locale/LC_MESSAGES
-  mkdir -p $dir
   for locale in $LOCALES
   do
+    dir=$DATADIR/locale/$locale/LC_MESSAGES
     dest=$dir/rembobine.mo
     echo "==> creating $dest"
     # compile & install
+    mkdir -p $dir
     msgfmt $locale -o $dest
   done
 }
