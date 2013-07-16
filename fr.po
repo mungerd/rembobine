@@ -7,13 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-20 21:36-0400\n"
+"POT-Creation-Date: 2013-07-16 00:30-0400\n"
 "PO-Revision-Date: 2013-06-20 11:50-0400\n"
 "Last-Translator: Beluet <mungerd@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
@@ -73,6 +73,22 @@ msgstr "iPod"
 msgid "Quality"
 msgstr "Qualité"
 
-#: rembobine.py:138
+#: rembobine.py:103
+msgid "Rotation"
+msgstr "Rotation"
+
+#: rembobine.py:105
+msgid "no rotation"
+msgstr "aucune rotation"
+
+#: rembobine.py:106
+msgid "90° right"
+msgstr "90° à droite"
+
+#: rembobine.py:107
+msgid "90° left"
+msgstr "90° à gauche"
+
+#: rembobine.py:153
 msgid "Save as..."
 msgstr "Enregistrer sous..."
