@@ -99,6 +99,21 @@ class AppWindow(Gtk.ApplicationWindow):
         grid.attach(label, 0, 3, 1, 1)
         grid.attach(scale, 1, 3, 1, 1)
 
+        # rotation
+        label = Gtk.Label(_("Rotation"), halign=Gtk.Align.END)
+        store = Gtk.ListStore(str, str)
+        store.append([_("no rotation"), ''])
+        store.append([_("90° right"),   '1'])
+        store.append([_("90° left"),    '2'])
+        self.rotation = Gtk.ComboBox.new_with_model(store)
+        for col in range(1):
+            renderer_text = Gtk.CellRendererText()
+            self.rotation.pack_start(renderer_text, True)
+            self.rotation.add_attribute(renderer_text, "text", col)
+        self.rotation.set_active(0)
+        grid.attach(label,           0, 4, 1, 1)
+        grid.attach(self.rotation,   1, 4, 1, 1)
+
         # actions
         box = Gtk.Box()
         grid.attach_next_to(box, label, Gtk.PositionType.BOTTOM, 2, 1)
@@ -177,13 +192,21 @@ class AppWindow(Gtk.ApplicationWindow):
         dialog.add_filter(filt)
 
     def convert(self, outfile):
+
         infile = self.input_file.get_filename()
         resolution = self.resolution.get_active_iter()
+        rotation = self.rotation.get_active_iter()
         filters = []
+
         if resolution:
             resolution = self.resolution.get_model()[resolution][1]
             if resolution:
                 filters.append('scale={}:{}'.format(*resolution.split('x')))
+
+        if rotation:
+            rotation = self.rotation.get_model()[rotation][1]
+            if rotation:
+                filters.append('rotate={}'.format(rotation))
 
         crf = self.crf_min + (self.crf_max - self.crf_min) \
                 * self.quality.get_value() / 100
