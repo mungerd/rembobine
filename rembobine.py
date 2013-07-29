@@ -71,6 +71,20 @@ class AppWindow(Gtk.ApplicationWindow):
         grid.attach(label,            0, 1, 1, 1)
         grid.attach(self.information, 1, 1, 1, 1)
 
+        # codec
+        label = Gtk.Label(_("Codec"), halign=Gtk.Align.END)
+        store = Gtk.ListStore(str, str)
+        store.append([_("x264"), 'x264'])
+        store.append([_("Xvid"), 'xvid'])
+        self.codec = Gtk.ComboBox.new_with_model(store)
+        for col in range(1):
+            renderer_text = Gtk.CellRendererText()
+            self.codec.pack_start(renderer_text, True)
+            self.codec.add_attribute(renderer_text, "text", col)
+        self.codec.set_active(0)
+        grid.attach(label,           0, 2, 1, 1)
+        grid.attach(self.codec,      1, 2, 1, 1)
+
         # resolution
         label = Gtk.Label(_("Resolution"), halign=Gtk.Align.END)
         store = Gtk.ListStore(str, str, str)
@@ -88,16 +102,16 @@ class AppWindow(Gtk.ApplicationWindow):
             self.resolution.pack_start(renderer_text, True)
             self.resolution.add_attribute(renderer_text, "text", col)
         self.resolution.set_active(0)
-        grid.attach(label,           0, 2, 1, 1)
-        grid.attach(self.resolution, 1, 2, 1, 1)
+        grid.attach(label,           0, 3, 1, 1)
+        grid.attach(self.resolution, 1, 3, 1, 1)
 
         # quality
         label = Gtk.Label(_("Quality"), halign=Gtk.Align.END)
         self.quality = Gtk.Adjustment(75, 0, 100, 1, 10, 0)
         scale = Gtk.Scale(adjustment=self.quality, draw_value=True, digits=0)
         #scale = Gtk.SpinButton(adjustment=self.quality, numeric=True)
-        grid.attach(label, 0, 3, 1, 1)
-        grid.attach(scale, 1, 3, 1, 1)
+        grid.attach(label, 0, 4, 1, 1)
+        grid.attach(scale, 1, 4, 1, 1)
 
         # rotation
         label = Gtk.Label(_("Rotation"), halign=Gtk.Align.END)
@@ -111,8 +125,8 @@ class AppWindow(Gtk.ApplicationWindow):
             self.rotation.pack_start(renderer_text, True)
             self.rotation.add_attribute(renderer_text, "text", col)
         self.rotation.set_active(0)
-        grid.attach(label,           0, 4, 1, 1)
-        grid.attach(self.rotation,   1, 4, 1, 1)
+        grid.attach(label,           0, 5, 1, 1)
+        grid.attach(self.rotation,   1, 5, 1, 1)
 
         # actions
         box = Gtk.Box()
@@ -194,9 +208,13 @@ class AppWindow(Gtk.ApplicationWindow):
     def convert(self, outfile):
 
         infile = self.input_file.get_filename()
+        codec = self.codec.get_active_iter()
         resolution = self.resolution.get_active_iter()
         rotation = self.rotation.get_active_iter()
         filters = []
+
+        if codec:
+            codec = self.codec.get_model()[codec][1]
 
         if resolution:
             resolution = self.resolution.get_model()[resolution][1]
@@ -208,16 +226,22 @@ class AppWindow(Gtk.ApplicationWindow):
             if rotation:
                 filters.append('rotate={}'.format(rotation))
 
-        crf = self.crf_min + (self.crf_max - self.crf_min) \
-                * self.quality.get_value() / 100
-
         # construct command line
-        cmd = ['mencoder', infile, '-o', outfile,
-                '-oac', 'mp3lame',
-                '-ovc', 'x264', '-x264encopts',
-                'crf={}:threads=auto'.format(crf)]
+        cmd = ['mencoder', infile, '-o', outfile, '-oac', 'mp3lame']
+
+        if codec == 'x264':
+            crf = self.crf_min + (self.crf_max - self.crf_min) \
+                    * self.quality.get_value() / 100
+            cmd += ['-ovc', 'x264', '-x264encopts',
+                    'crf={}:threads=auto'.format(crf)]
+        elif codec == 'xvid':
+            quantum = int(31 - 30 * self.quality.get_value() / 100)
+            cmd += ['-ovc', 'xvid', '-xvidencopts',
+                    'fixed_quant={}:threads=4'.format(quantum)]
+
         if filters:
             cmd += ['-vf', ','.join(filters)]
+
         print(' '.join('"{}"'.format(x) for x in cmd))
         self.mencoder_process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL, bufsize=80)
