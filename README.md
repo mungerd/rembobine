@@ -2,8 +2,8 @@
 
 ## Description
 
-Transcodes input video files into x264 videos with customizable quality and
-resolution.
+Frontend to [MEncoder](http://www.mplayerhq.hu/) that transcodes input video
+files into x264 or Xvid videos with customizable quality and resolution.
 
 ![Screenshot](screenshots/2013-06-20.png "Screenshot")
 
